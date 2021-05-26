@@ -1,0 +1,23 @@
+base_cluster_path: "~/Testing/Clusters"
+base_ocs_path: "~/Testing/OCS-CI"
+
+# The Openshift cluster information
+cluster_path: "{{ base_cluster_path }}/VC7-Arbiter"
+cluster_name: "alayani-arbiter"
+cluster_config_file: "{{ base_ocs_path }}/conf/avili/vc7_arbiter_conf.yaml"
+kubeconfig: "{{ cluster_path }}/auth/kubeconfig"
+
+
+# The netem rpm information
+netem_base_url: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages"
+netem_get_pkg: "{{ netem_base_url }}/iproute-tc-5.3.0-5.el8.x86_64.rpm"
+netem_trg_pkg: "netem.rpm"  
+
+# the default delay to inject for network truffic (one way)
+inj_delay: 5
+
+zone_locator: "topology.beta.kubernetes.io/zone"
+zones:
+  zonea: "Zone-A"
+  zoneb: "Zone-B"
+  zonec: "Zone-C"

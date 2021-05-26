@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+
+mount -o remount,rw /usr
+
+rpm -i /tmp/{{ netem_trg_pkg }}
+
+modprobe sch_netem
+
+IFC=`ip a | grep "10\." | awk '{print $NF}' | grep -v tun`
+HOST=`hostname`
+
+ZONEA=({% for host in groups['zonea'] %} '{{ host }}' {% endfor %})
+ZONEB=({% for host in groups['zoneb'] %} '{{ host }}' {% endfor %})
+ZONEC=({% for host in groups['zonec'] %} '{{ host }}' {% endfor %})
+
+if [[ " ${ZONEA[@]} " =~ " ${HOST} " ]]; then
+	ZONE='A'
+	delayed=( "${ZONEB[@]}" "${ZONEC[@]}" )
+fi
+
+if [[ " ${ZONEB[@]} " =~ " ${HOST} " ]]; then
+	ZONE='B'
+	delayed=( "${ZONEA[@]}" "${ZONEC[@]}" )
+fi
+
+if [[ " ${ZONEC[@]} " =~ " ${HOST} " ]]; then
+	ZONE='C'
+	delayed=( "${ZONEA[@]}" "${ZONEB[@]}" )
+fi
+
+echo "Running on $HOST in Zone $ZONE"
+echo "Going to delay traffic to ${delayed[@]}"
+
+echo "Network interface is $IFC"
+
+echo "Delete the qdisc device"
+tc qdisc del dev ${IFC} root
+
+echo
+echo "Adding the main handle"
+tc qdisc add dev ${IFC} root handle 1: prio
+
+echo
+echo "Adding Delay's"
+tc qdisc add dev ${IFC} parent 1:1 handle 2: netem delay {{ inj_delay }}ms
+
+echo
+echo "Adding fiter to specific IP's"
+
+for host in ${delayed[@]} ; do
+	IP=`nslookup $host | grep Address: | tail -n 1 | awk '{print $NF}'`
+	echo "adding delay to $host ($IP)"
+	tc filter add dev $IFC parent 1: protocol ip prio 2 u32 match ip dst ${IP}/32 flowid 3:1
+done
+
