@@ -16,7 +16,7 @@ netem_trg_pkg: "netem.rpm"
 # the default delay to inject for network truffic (one way)
 inj_delay: 5
 
-zone_locator: "topology.beta.kubernetes.io/zone"
+zone_locator: "topology.kubernetes.io/zone"
 zones:
   zonea: "Zone-A"
   zoneb: "Zone-B"
