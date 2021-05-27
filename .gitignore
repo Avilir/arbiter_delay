@@ -1,0 +1,3 @@
+*.rpm
+*.orig
+inventory/*
