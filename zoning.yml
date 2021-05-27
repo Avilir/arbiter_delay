@@ -1,0 +1,20 @@
+---
+- name: "Labeling nodes with zone name"
+  hosts: nodes
+  become: "false"
+  gather_facts: "false"
+  tasks:
+
+    - name: "Check if node labeld with the zone name"
+      shell:
+        cmd: "oc get node --kubeconfig {{ kubeconfig }} {{ inventory_hostname }} -L {{ zone_locator }} | grep {{ zones[hostvars[inventory_hostname].group_names[-1]] }}"
+      register: rc
+      delegate_to: "localhost"
+      ignore_errors: "yes"
+
+    - name: "Labaleing the node"
+      shell:
+        cmd: "oc --kubeconfig {{ kubeconfig }} label node {{ inventory_hostname }} {{ zone_locator }}={{ zones[hostvars[inventory_hostname].group_names[-1]] }}"
+      delegate_to: "localhost"
+      when: "rc.rc != 0"
+
