@@ -7,12 +7,6 @@ cluster_name: "alayani-arbiter"
 cluster_config_file: "{{ base_ocs_path }}/conf/avili/vc7_arbiter_conf.yaml"
 kubeconfig: "{{ cluster_path }}/auth/kubeconfig"
 
-
-# The netem rpm information
-netem_base_url: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages"
-netem_get_pkg: "{{ netem_base_url }}/iproute-tc-5.3.0-5.el8.x86_64.rpm"
-netem_trg_pkg: "netem.rpm"  
-
 # the default delay to inject for network truffic (one way)
 inj_delay: 5
 

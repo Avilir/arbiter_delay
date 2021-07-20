@@ -1,7 +1,9 @@
 ---
-- name: "Getting the netem bundle"
+- name: "Check oc and cluster access"
   hosts: "control"
   become: "false"
+  tags:
+    - checking
   tasks:
     - name: "Verify That OC client  is exist"
       command: 
@@ -15,23 +17,17 @@
       register: rc
       failed_when: "rc.rc != 0"
 
-    - name: "Getting the rpm file"
-      get_url:
-        url: "{{ netem_get_pkg }}"
-        dest: "{{ playbook_dir }}/{{ netem_trg_pkg }}"
-        mode: "0664"
-
 - name: "Labeling nodes with zone name"
   include: zoning.yml
+  tags:
+    - labeling
 
 - name: "Enableing Netem"
   hosts: "nodes"
   remote_user: "core"  
+  tags:
+    - setup
   tasks:
-    - name: "Copy the Netem package to the hosts"
-      copy:
-        src: "{{ playbook_dir }}/{{ netem_trg_pkg }}"
-        dest: "/tmp/"
 
     - name: "Copy configuration script"
       template:
