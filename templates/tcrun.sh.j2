@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-
-mount -o remount,rw /usr
-
-rpm -i /tmp/{{ netem_trg_pkg }}
-
 modprobe sch_netem
 
 IFC=`ip a | grep "10\." | awk '{print $NF}' | grep -v tun`
